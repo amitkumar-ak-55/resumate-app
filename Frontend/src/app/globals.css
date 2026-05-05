@@ -1,0 +1,152 @@
+/* Tailwind layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* -------- Base styles -------- */
+@layer base {
+  html { @apply scroll-smooth; }
+  body {
+    @apply antialiased;
+    background:
+      radial-gradient(circle at 50% 32%, rgba(110, 116, 211, 0.22), transparent 17%),
+      radial-gradient(circle at 50% 55%, rgba(132, 57, 179, 0.18), transparent 18%),
+      linear-gradient(180deg, #04050c 0%, #070914 38%, #05060d 100%);
+    color: #e5e7eb;
+  }
+}
+
+/* -------- Re-usable components -------- */
+@layer components {
+  .btn-primary {
+    @apply rounded-full px-6 py-3 font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply rounded-full border border-white/10 bg-white/5 px-6 py-3 font-medium text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .precision-display {
+    font-family: Georgia, "Times New Roman", Times, serif;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.05), 0 14px 36px rgba(16, 12, 36, 0.34);
+  }
+
+  .precision-hero {
+    background:
+      radial-gradient(circle at center, rgba(115, 127, 255, 0.06), transparent 32%),
+      linear-gradient(180deg, rgba(3, 3, 8, 0.92), rgba(3, 4, 10, 0.96));
+  }
+
+  .precision-grid {
+    background-image:
+      linear-gradient(rgba(144, 151, 198, 0.11) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(144, 151, 198, 0.11) 1px, transparent 1px);
+    background-position: center center;
+    background-size: 34px 34px;
+    opacity: 0.42;
+  }
+
+  .precision-vignette {
+    background:
+      radial-gradient(circle at center, transparent 22%, rgba(4, 5, 12, 0.22) 54%, rgba(3, 4, 10, 0.82) 88%),
+      linear-gradient(180deg, rgba(2, 3, 8, 0.15), rgba(2, 3, 8, 0.62));
+  }
+
+  .precision-nav {
+    background:
+      linear-gradient(180deg, rgba(31, 32, 46, 0.72), rgba(23, 24, 36, 0.58));
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 16px 40px rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(18px);
+  }
+
+  .precision-nav-link {
+    transition: color 150ms ease, opacity 150ms ease;
+  }
+
+  .precision-nav-link:hover {
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .precision-cta {
+    background:
+      radial-gradient(circle at 30% 30%, rgba(207, 157, 255, 0.45), transparent 34%),
+      linear-gradient(90deg, #7c49df 0%, #b015e4 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 12px 30px rgba(132, 47, 216, 0.38),
+      0 0 42px rgba(157, 80, 255, 0.34);
+  }
+
+  .precision-cta-float {
+    animation: precision-float 3.8s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .precision-cta:hover {
+    filter: brightness(1.08);
+  }
+
+  @keyframes precision-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  .precision-orb {
+    width: 34rem;
+    height: 34rem;
+    border-radius: 9999px;
+    filter: blur(82px);
+    pointer-events: none;
+  }
+
+  .precision-orb-top {
+    background: radial-gradient(circle, rgba(108, 132, 255, 0.36) 0%, rgba(108, 132, 255, 0.12) 42%, transparent 72%);
+  }
+
+  .precision-orb-bottom {
+    background: radial-gradient(circle, rgba(128, 52, 175, 0.32) 0%, rgba(128, 52, 175, 0.1) 40%, transparent 72%);
+  }
+
+  .precision-web {
+    opacity: 0.32;
+    background-repeat: no-repeat;
+    background-size: cover;
+    filter: blur(0.2px);
+    pointer-events: none;
+  }
+
+  .precision-web-left {
+    background-image:
+      linear-gradient(55deg, transparent 24%, rgba(190, 198, 255, 0.12) 25%, transparent 26%),
+      linear-gradient(120deg, transparent 46%, rgba(190, 198, 255, 0.1) 47%, transparent 48%),
+      radial-gradient(circle at 24% 42%, rgba(196, 205, 255, 0.32) 0 2px, transparent 6px),
+      radial-gradient(circle at 38% 63%, rgba(196, 205, 255, 0.26) 0 2px, transparent 7px),
+      radial-gradient(circle at 16% 76%, rgba(196, 205, 255, 0.2) 0 2px, transparent 7px);
+  }
+
+  .precision-web-right {
+    background-image:
+      linear-gradient(-58deg, transparent 28%, rgba(190, 198, 255, 0.12) 29%, transparent 30%),
+      linear-gradient(-120deg, transparent 48%, rgba(190, 198, 255, 0.11) 49%, transparent 50%),
+      radial-gradient(circle at 74% 34%, rgba(196, 205, 255, 0.3) 0 2px, transparent 6px),
+      radial-gradient(circle at 56% 48%, rgba(196, 205, 255, 0.24) 0 2px, transparent 7px),
+      radial-gradient(circle at 82% 64%, rgba(196, 205, 255, 0.18) 0 2px, transparent 8px);
+  }
+
+  @media (max-width: 768px) {
+    .precision-orb {
+      width: 22rem;
+      height: 22rem;
+      filter: blur(64px);
+    }
+  }
+}

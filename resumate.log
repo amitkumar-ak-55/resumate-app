@@ -1,0 +1,3 @@
+2026-04-29 01:18:40,824 - app.config - INFO - Temp directory: C:\Users\sahoo\OneDrive\Documents\resumebuilder\temp_files
+2026-04-29 01:18:40,825 - app.config - WARNING - GEMINI_API_KEY not found in .env file. AI features will be disabled.
+2026-04-29 01:18:40,825 - app.config - WARNING - Get a key from https://makersuite.google.com/ and add it to your .env file.

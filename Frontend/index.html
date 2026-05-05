@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumate - AI Resume Optimizer</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef } = React;
+
+        function ResumateApp() {
+            const [resumeFile, setResumeFile] = useState(null);
+            const [jobDescription, setJobDescription] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const [error, setError] = useState('');
+            const [results, setResults] = useState(null);
+            const fileInputRef = useRef(null);
+
+            const handleFileUpload = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                    if (allowedTypes.includes(file.type)) {
+                        setResumeFile(file);
+                        setError('');
+                    } else {
+                        setError('Please upload a PDF or DOCX file only.');
+                        setResumeFile(null);
+                    }
+                }
+            };
+
+            const handleSubmit = async (event) => {
+                event.preventDefault();
+                
+                if (!resumeFile || !jobDescription.trim()) {
+                    setError('Please upload a resume file and enter a job description.');
+                    return;
+                }
+
+                setIsLoading(true);
+                setError('');
+                setResults(null);
+
+                try {
+                    const formData = new FormData();
+                    formData.append('resume_file', resumeFile);
+                    formData.append('job_description', jobDescription);
+
+                    // Replace with your actual backend URL
+                    const response = await fetch('http://localhost:8000/optimize-resume', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+
+                    const contentType = response.headers.get('content-type');
+                    
+                    if (contentType && contentType.includes('application/json')) {
+                        // If backend returns JSON with download URLs
+                        const data = await response.json();
+                        setResults(data);
+                    } else {
+                        // If backend returns file directly (ZIP)
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = 'optimized-documents.zip';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        setResults({ message: 'Files downloaded successfully!' });
+                    }
+                } catch (err) {
+                    setError(`Failed to optimize resume: ${err.message}`);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            const downloadFile = async (url, filename) => {
+                try {
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    const downloadUrl = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = downloadUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(downloadUrl);
+                } catch (err) {
+                    setError(`Failed to download file: ${err.message}`);
+                }
+            };
+
+            const resetForm = () => {
+                setResumeFile(null);
+                setJobDescription('');
+                setResults(null);
+                setError('');
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+                    {/* Header */}
+                    <header className="bg-white shadow-sm border-b">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                                        <i className="fas fa-file-alt text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h1 className="text-2xl font-bold text-gray-900">Resumate</h1>
+                                        <p className="text-sm text-gray-600">AI-Powered Resume Optimizer</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        {!results ? (
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                                {/* Hero Section */}
+                                <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-12 text-white">
+                                    <h2 className="text-3xl font-bold mb-4">Optimize Your Resume with AI</h2>
+                                    <p className="text-xl opacity-90 mb-6">
+                                        Upload your resume and job description to get an ATS-optimized resume and personalized cover letter.
+                                    </p>
+                                    <div className="flex items-center space-x-6 text-sm">
+                                        <div className="flex items-center space-x-2">
+                                            <i className="fas fa-check-circle"></i>
+                                            <span>ATS Optimized</span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <i className="fas fa-check-circle"></i>
+                                            <span>AI-Powered</span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <i className="fas fa-check-circle"></i>
+                                            <span>Instant Results</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Form */}
+                                <form onSubmit={handleSubmit} className="p-8 space-y-8">
+                                    {/* File Upload */}
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                            Upload Your Resume
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept=".pdf,.docx"
+                                                onChange={handleFileUpload}
+                                                className="hidden"
+                                                id="resume-upload"
+                                            />
+                                            <label
+                                                htmlFor="resume-upload"
+                                                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                                            >
+                                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                    <i className="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
+                                                    <p className="mb-2 text-sm text-gray-500">
+                                                        <span className="font-semibold">Click to upload</span> or drag and drop
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">PDF or DOCX (MAX. 10MB)</p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        {resumeFile && (
+                                            <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                                <div className="flex items-center space-x-2">
+                                                    <i className="fas fa-file text-green-600"></i>
+                                                    <span className="text-sm text-green-800 font-medium">{resumeFile.name}</span>
+                                                    <span className="text-xs text-green-600">({(resumeFile.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Job Description */}
+                                    <div>
+                                        <label htmlFor="job-description" className="block text-sm font-semibold text-gray-700 mb-3">
+                                            Job Description
+                                        </label>
+                                        <textarea
+                                            id="job-description"
+                                            rows="10"
+                                            value={jobDescription}
+                                            onChange={(e) => setJobDescription(e.target.value)}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all duration-200"
+                                            placeholder="Paste the complete job description here. Include requirements, responsibilities, skills needed, etc."
+                                        />
+                                        <p className="mt-2 text-xs text-gray-500">
+                                            {jobDescription.length} characters • Include as much detail as possible for better optimization
+                                        </p>
+                                    </div>
+
+                                    {/* Error Message */}
+                                    {error && (
+                                        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                                            <div className="flex items-center space-x-2">
+                                                <i className="fas fa-exclamation-circle text-red-600"></i>
+                                                <span className="text-sm text-red-800">{error}</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Submit Button */}
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading || !resumeFile || !jobDescription.trim()}
+                                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                                    >
+                                        {isLoading ? (
+                                            <div className="flex items-center justify-center space-x-2">
+                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                                <span>Optimizing Your Resume...</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-center space-x-2">
+                                                <i className="fas fa-magic"></i>
+                                                <span>Optimize Resume & Generate Cover Letter</span>
+                                            </div>
+                                        )}
+                                    </button>
+                                </form>
+                            </div>
+                        ) : (
+                            /* Results Section */
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                                <div className="bg-gradient-to-r from-green-500 to-blue-500 px-8 py-8 text-white">
+                                    <div className="flex items-center space-x-3 mb-4">
+                                        <i className="fas fa-check-circle text-2xl"></i>
+                                        <h2 className="text-2xl font-bold">Optimization Complete!</h2>
+                                    </div>
+                                    <p className="text-lg opacity-90">
+                                        Your resume has been optimized and a matching cover letter has been generated.
+                                    </p>
+                                </div>
+
+                                <div className="p-8">
+                                    {results.resume_url && results.cover_letter_url ? (
+                                        <div className="space-y-6">
+                                            {/* Download Buttons */}
+                                            <div className="grid md:grid-cols-2 gap-4">
+                                                <button
+                                                    onClick={() => downloadFile(results.resume_url, 'optimized-resume.docx')}
+                                                    className="flex items-center justify-center space-x-3 bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                                                >
+                                                    <i className="fas fa-download text-lg"></i>
+                                                    <span className="font-semibold">Download Optimized Resume</span>
+                                                </button>
+
+                                                <button
+                                                    onClick={() => downloadFile(results.cover_letter_url, 'cover-letter.docx')}
+                                                    className="flex items-center justify-center space-x-3 bg-purple-600 text-white py-4 px-6 rounded-lg hover:bg-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                                                >
+                                                    <i className="fas fa-download text-lg"></i>
+                                                    <span className="font-semibold">Download Cover Letter</span>
+                                                </button>
+                                            </div>
+
+                                            {/* Additional Info */}
+                                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                                <div className="flex items-start space-x-3">
+                                                    <i className="fas fa-info-circle text-blue-600 text-lg mt-0.5"></i>
+                                                    <div>
+                                                        <h3 className="font-semibold text-blue-900 mb-2">What we optimized:</h3>
+                                                        <ul className="text-sm text-blue-800 space-y-1">
+                                                            <li>• Integrated relevant keywords from the job description</li>
+                                                            <li>• Optimized for Applicant Tracking Systems (ATS)</li>
+                                                            <li>• Enhanced skill descriptions and achievements</li>
+                                                            <li>• Generated a personalized cover letter</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-8">
+                                            <p className="text-gray-600">{results.message || 'Files processed successfully!'}</p>
+                                        </div>
+                                    )}
+
+                                    {/* New Optimization Button */}
+                                    <div className="mt-8 pt-6 border-t border-gray-200">
+                                        <button
+                                            onClick={resetForm}
+                                            className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium"
+                                        >
+                                            <i className="fas fa-plus mr-2"></i>
+                                            Optimize Another Resume
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-gray-50 border-t">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                            <div className="text-center text-sm text-gray-600">
+                                <p>© 2025 Resumate - AI-Powered Resume Optimization</p>
+                                <p className="mt-1">Secure • Fast • No Login Required</p>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<ResumateApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
