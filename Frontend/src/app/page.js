@@ -238,7 +238,7 @@ export default function ResumateApp() {
               Upload your resume and target role details.
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-white/60">
-              This is the second step in the flow. Add your resume, paste the job description, and we will send you to
+              Add your resume, paste the job description, and we will send you to
               the analysis section once the optimization is ready.
             </p>
           </div>
@@ -266,11 +266,7 @@ export default function ResumateApp() {
             <h2 className="precision-display mt-4 text-4xl text-white sm:text-5xl">
               Review the optimized output.
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-white/60">
-              This final area is reserved for the generated files and improvement notes, so the flow reads like a real
-              product journey from start to finish.
-            </p>
-          </div>
+            </div>
 
           {results ? (
             <ResultsPanel
@@ -279,14 +275,19 @@ export default function ResumateApp() {
               onReset={handleReset}
             />
           ) : (
-            <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(14,16,31,0.92),rgba(7,8,18,0.96))] p-8 text-center shadow-[0_24px_80px_rgba(0,0,0,0.3)]">
-              <div className="mx-auto max-w-2xl rounded-[24px] border border-white/8 bg-white/[0.03] px-6 py-10">
-                <p className="text-xs uppercase tracking-[0.24em] text-white/42">Waiting For Analysis</p>
-                <h3 className="mt-4 text-2xl font-semibold text-white">Run the optimizer to unlock this section.</h3>
-                <p className="mt-4 text-sm leading-7 text-white/62">
-                  Once you submit the uploader form, the optimized resume, cover letter, and analysis summary will land
-                  here automatically.
-                </p>
+            <div className="analysis-waiting-wrapper">
+              <div className="analysis-waiting-panel">
+                <div className="analysis-waiting-inner">
+                  <div className="analysis-waiting-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="analysis-waiting-lock"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </div>
+                  <p className="analysis-waiting-label">Waiting For Analysis</p>
+                  <h3 className="analysis-waiting-title">Run the optimizer to unlock this section.</h3>
+                  <p className="analysis-waiting-desc">
+                    Once you submit the uploader form, the optimized resume, cover letter, and analysis summary will land
+                    here automatically.
+                  </p>
+                </div>
               </div>
             </div>
           )}
